@@ -7,8 +7,12 @@ glance. It is the iOS successor to the single-file Grid Time Lens (GTL) dashboar
 
 ![GridLens 360 — Command, Corridors, Kingdom](docs/preview-screens.png)
 
-*Design preview rendered on the build host. The shipped UI is native SwiftUI with live
-motion (flowing corridor dashes, count-up KPIs, animated schematic and gauges).*
+![GridLens 360 — Sources, Ledger](docs/preview-screens-2.png)
+
+*Design previews rendered on the build host. The shipped UI is native SwiftUI with live
+motion (flowing corridor dashes, count-up KPIs, animated schematic and gauges). In the
+provenance chips, a `#` marks a real harvested PI tag / feed apply-key and an italic `ƒ`
+marks an honest derivation descriptor.*
 
 ## What it shows
 
