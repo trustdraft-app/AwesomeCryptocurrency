@@ -1,0 +1,280 @@
+/* GridLens 360 — component styles */
+
+/* ── KPI tile ─────────────────────────────────────────────── */
+.kpi {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-md);
+  padding: 12px 13px;
+  overflow: hidden;
+  min-width: 0;
+}
+.kpi::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--accent, var(--blue));
+  box-shadow: 0 0 12px var(--accent, var(--blue));
+}
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpi-value {
+  font-weight: 800;
+  line-height: 1.05;
+  margin-top: 5px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.kpi-unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  margin-left: 4px;
+}
+.kpi-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  min-height: 26px;
+}
+.kpi-trend {
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* ── Pills / badges ───────────────────────────────────────── */
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--green);
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(72, 217, 134, 0.35);
+  background: rgba(72, 217, 134, 0.12);
+}
+.live-pill.snap {
+  color: var(--amber);
+  border-color: rgba(255, 194, 75, 0.35);
+  background: rgba(255, 194, 75, 0.12);
+}
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 currentColor;
+  animation: pulse 1.8s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+  70% { box-shadow: 0 0 0 7px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+.health-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+/* ── Top command bar ──────────────────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--topbar-h);
+  padding: 0 16px;
+  padding-top: var(--safe-top);
+  height: calc(var(--topbar-h) + var(--safe-top));
+  background: rgba(4, 16, 28, 0.72);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-bottom: 1px solid var(--stroke);
+}
+.topbar .brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.topbar .brand b {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.topbar .brand span {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+.topbar .mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(140deg, var(--blue-deep), var(--teal));
+  box-shadow: 0 4px 14px rgba(39, 136, 245, 0.4);
+  flex-shrink: 0;
+}
+.topbar .spacer { margin-left: auto; }
+
+/* ── Bottom tab bar ───────────────────────────────────────── */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  display: flex;
+  height: calc(var(--tabbar-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: rgba(6, 22, 38, 0.86);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-top: 1px solid var(--stroke);
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--ink-faint);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  position: relative;
+  transition: color 0.2s;
+}
+.tab.active { color: var(--blue); }
+.tab.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 26px;
+  height: 3px;
+  border-radius: 0 0 4px 4px;
+  background: var(--blue);
+  box-shadow: 0 0 10px var(--blue);
+}
+.tab svg { width: 21px; height: 21px; }
+
+/* ── Hero (overview national) ─────────────────────────────── */
+.hero {
+  position: relative;
+  border-radius: var(--r-lg);
+  padding: 18px;
+  background: linear-gradient(150deg, rgba(39, 136, 245, 0.16), rgba(66, 210, 206, 0.06) 60%, transparent);
+  border: 1px solid var(--stroke-strong);
+  overflow: hidden;
+}
+.hero .glow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -60px;
+  top: -80px;
+  background: radial-gradient(circle, rgba(66, 210, 206, 0.28), transparent 70%);
+  pointer-events: none;
+}
+.hero-big {
+  font-size: 52px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.hero-big .u { font-size: 20px; font-weight: 700; color: var(--ink-dim); margin-left: 6px; }
+
+/* ── list rows ────────────────────────────────────────────── */
+.lrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--stroke);
+}
+.lrow:last-child { border-bottom: none; }
+.lrow .tag {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
+}
+
+/* map */
+.map-wrap { position: relative; }
+.map-node text { pointer-events: none; }
+
+/* segmented control */
+.seg {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+}
+.seg button {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 6px;
+  border-radius: 8px;
+  color: var(--ink-dim);
+  transition: all 0.2s;
+}
+.seg button.on {
+  background: var(--accent, var(--blue));
+  color: #04101c;
+  font-weight: 750;
+}
+
+/* insight strip */
+.insight {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 11px 13px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+.insight b { color: var(--ink); font-weight: 700; }
+.insight .ic { font-size: 15px; line-height: 1.2; }
+
+.foot-note {
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  margin: 20px 6px 6px;
+  line-height: 1.5;
+}
