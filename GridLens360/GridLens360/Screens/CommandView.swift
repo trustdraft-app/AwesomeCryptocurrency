@@ -75,7 +75,7 @@ private struct HeroKPI: View {
                 .font(.system(size: 9.5, weight: .semibold))
                 .tracking(0.6)
                 .foregroundStyle(Theme.textSecondary)
-                .lineLimit(1).minimumScaleFactor(0.8)
+                .lineLimit(1).minimumScaleFactor(0.6)
             CountUp(target: metric.value, font: Theme.number(30, weight: .heavy), color: accent)
             TagChip(tag: metric.tag, timestamp: metric.timestamp, isPITag: metric.isPITag)
         }

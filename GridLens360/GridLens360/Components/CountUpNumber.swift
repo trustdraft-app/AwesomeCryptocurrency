@@ -22,10 +22,16 @@ struct CountUpNumber: View, Animatable {
     }
 
     var body: some View {
+        // The Animatable `value` above already interpolates frame-by-frame, which
+        // *is* the count-up ramp; layering `.contentTransition(.numericText())` on
+        // top would make the odometer transition restart every frame and ghost the
+        // digits, so it is deliberately omitted. minimumScaleFactor guards against
+        // an unusually wide figure clipping inside a narrow KPI tile.
         Text(format(value))
             .font(font)
             .foregroundStyle(color)
-            .contentTransition(.numericText())
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
     }
 }
 

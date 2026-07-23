@@ -62,11 +62,23 @@ struct Metric: Identifiable, Equatable {
     /// Grouped display, e.g. "21,964". Decimals preserved only when meaningful.
     var display: String { Self.grouped(value) }
 
+    /// Grouped display with honest, un-padded precision:
+    /// whole numbers show no decimals; values below 1,000 keep up to two real
+    /// decimals (so 181.15 stays 181.15 and 57.6 stays 57.6, never "57.60");
+    /// large figures round to whole MW (so generation reads "23,994", not
+    /// "23,994.4"). `minimumFractionDigits` stays 0 — trailing zeros are never
+    /// padded.
     static func grouped(_ v: Double) -> String {
         let f = NumberFormatter()
         f.numberStyle = .decimal
-        f.maximumFractionDigits = (v.rounded() == v) ? 0 : (abs(v) < 100 ? 2 : 1)
-        f.minimumFractionDigits = f.maximumFractionDigits
+        f.minimumFractionDigits = 0
+        if v.rounded() == v {
+            f.maximumFractionDigits = 0
+        } else if abs(v) < 1_000 {
+            f.maximumFractionDigits = 2
+        } else {
+            f.maximumFractionDigits = 0
+        }
         return f.string(from: NSNumber(value: v)) ?? "\(v)"
     }
 }
@@ -98,6 +110,9 @@ struct Corridor: Identifiable {
     let legs: [CorridorLeg]
     /// Whether the metered legs may be expanded on the card.
     let showLegs: Bool
+    /// True when `tag` is a real harvested PI tag / SYS_CALC identifier; false when
+    /// it is a prose descriptor (so the chip shows the derived glyph, not "#").
+    let isPITag: Bool
     /// Optional basis note printed on the card (e.g. partial-vs-boundary caveat).
     let note: String?
 
@@ -110,10 +125,10 @@ struct Corridor: Identifiable {
 
     init(from: String, to: String, net: Double, tag: String, timestamp: String,
          basis: MetricBasis = .snapshot, legs: [CorridorLeg] = [], showLegs: Bool = true,
-         note: String? = nil) {
+         isPITag: Bool = true, note: String? = nil) {
         self.from = from; self.to = to; self.net = net; self.tag = tag
         self.timestamp = timestamp; self.basis = basis; self.legs = legs
-        self.showLegs = showLegs; self.note = note
+        self.showLegs = showLegs; self.isPITag = isPITag; self.note = note
     }
 }
 
@@ -203,6 +218,7 @@ struct GridSnapshot {
                     CorridorLeg(name: "SHED", mw: 472.5, tag: "SHED"),
                     CorridorLeg(name: "FARS", mw: 400.0, tag: "FARS")
                  ],
+                 isPITag: false,
                  note: "Signed net of six lines (two import, four export). Gross |Σ| 1,412 is NOT the number. Full boundary is 1,141.5 MW (SYS_CALC:EOA_COA_ICHG, not in this snapshot)."),
         Corridor(from: "EOA", to: "NE", net: 114.2,
                  tag: "EOA-NE:INTERCHANGE(LN_380KV_MW)", timestamp: "16:28",
@@ -318,9 +334,10 @@ struct GridSnapshot {
         func near(_ a: Double, _ b: Double, _ band: Double = 0.6) -> Bool { abs(a - b) <= band }
         var r: [(name: String, ok: Bool, detail: String)] = []
 
-        let coa = corridors.first { $0.from == "EOA" && $0.to == "COA" }!
-        let coaSum = coa.legs.reduce(0) { $0 + $1.mw }
-        r.append(("EOA→COA signed net = 726.0", near(coaSum, 726.0), "Σ legs = \(Metric.grouped(coaSum))"))
+        if let coa = corridors.first(where: { $0.from == "EOA" && $0.to == "COA" }) {
+            let coaSum = coa.legs.reduce(0) { $0 + $1.mw }
+            r.append(("EOA→COA signed net = 726.0", near(coaSum, 726.0), "Σ legs = \(Metric.grouped(coaSum))"))
+        }
 
         let renSum = renEOATerms.reduce(0, +)
         r.append(("Eastern renewables ≈ 674.9 (rings)", near(renSum, 674.9),
@@ -335,10 +352,11 @@ struct GridSnapshot {
         let pct = renNationalTotal.value / ksaPeak.value * 100
         r.append(("Renewables share = 13.62%", near(pct, renNationalPct, 0.02), String(format: "%.2f%%", pct)))
 
-        let gcc = corridors.first { $0.from == "EOA" && $0.to == "GCC" }!
-        let gccNet = gcc.legs.reduce(0) { $0 + $1.mw }
-        r.append(("GCC bipoles net ≈ 0 (DC ± convention)", near(gccNet, 0.0, 2.0),
-                  "Σ conductors = \(Metric.grouped(gccNet)) · total transfer 812 via HVDC:TOT_GCC_EXP"))
+        if let gcc = corridors.first(where: { $0.from == "EOA" && $0.to == "GCC" }) {
+            let gccNet = gcc.legs.reduce(0) { $0 + $1.mw }
+            r.append(("GCC bipoles net ≈ 0 (DC ± convention)", near(gccNet, 0.0, 2.0),
+                      "Σ conductors = \(Metric.grouped(gccNet)) · total transfer 812 via HVDC:TOT_GCC_EXP"))
+        }
 
         return r
     }

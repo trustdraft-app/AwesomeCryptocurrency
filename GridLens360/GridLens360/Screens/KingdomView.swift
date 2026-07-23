@@ -81,29 +81,31 @@ struct KingdomView: View {
 private struct KingdomMap: View {
     let grid: GridSnapshot
 
+    private struct Edge { let from: CGPoint; let to: CGPoint; let mw: Double; let label: String; let inbound: Bool }
+
     var body: some View {
         GeometryReader { geo in
             let w = geo.size.width, h = geo.size.height
             let gcc = CGPoint(x: 0.90 * w, y: 0.83 * h)
+            let edges: [Edge] = [
+                Edge(from: center("EOA", w, h), to: center("COA", w, h), mw: 726,   label: "726",   inbound: false),
+                Edge(from: center("COA", w, h), to: center("NEA", w, h), mw: 141.1, label: "141.1", inbound: false),
+                Edge(from: center("NWA", w, h), to: center("NEA", w, h), mw: 76,    label: "76",    inbound: false),
+                Edge(from: center("EOA", w, h), to: gcc,                 mw: 812,   label: "812",   inbound: true),
+            ]
             ZStack {
-                // Edges (drawn behind the nodes).
-                FlowEdge(from: center("EOA", w, h), to: center("COA", w, h),
-                         mw: 726, label: "726")
-                FlowEdge(from: center("COA", w, h), to: center("NEA", w, h),
-                         mw: 141, label: "141")
-                FlowEdge(from: center("NWA", w, h), to: center("NEA", w, h),
-                         mw: 76, label: "76")
-                FlowEdge(from: center("EOA", w, h), to: gcc,
-                         mw: 812, label: "812", accentInbound: true)
-
-                // Area nodes.
+                // 1 — animated edge lines (under the nodes).
+                ForEach(edges.indices, id: \.self) { i in
+                    FlowEdge(from: edges[i].from, to: edges[i].to, mw: edges[i].mw, accentInbound: edges[i].inbound)
+                }
+                // 2 — area nodes.
                 ForEach(grid.areaPeaks) { a in
                     AreaNode(code: a.code, sub: Metric.grouped(a.peak),
                              accent: a.code == "EOA" ? Theme.energy : Theme.textSecondary,
                              highlighted: a.code == "EOA")
                         .position(center(a.code, w, h))
                 }
-                // GCC interconnection node.
+                // 3 — GCC interconnection node.
                 VStack(spacing: 1) {
                     Text("GCC").font(.system(size: 12, weight: .heavy)).foregroundStyle(Theme.importIn)
                     Text("HVDC").font(.system(size: 7.5, weight: .semibold)).foregroundStyle(Theme.textTertiary)
@@ -112,8 +114,27 @@ private struct KingdomMap: View {
                 .background(RoundedRectangle(cornerRadius: 10).fill(Theme.surfaceHi)
                     .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.importIn.opacity(0.4), lineWidth: 1)))
                 .position(gcc)
+                // 4 — edge value labels ON TOP of the nodes, nudged clear of the line
+                //     so a tight corridor (e.g. COA↔EOA) can never hide the value.
+                ForEach(edges.indices, id: \.self) { i in
+                    EdgeLabel(text: edges[i].label,
+                              color: edges[i].inbound ? Theme.importIn : Theme.flowColor(edges[i].mw),
+                              at: Self.labelPoint(edges[i].from, edges[i].to))
+                }
             }
         }
+    }
+
+    /// Midpoint nudged ~15pt perpendicular to the edge, biased upward, so the
+    /// value pill sits just off the connecting line and clear of the node band.
+    private static func labelPoint(_ a: CGPoint, _ b: CGPoint) -> CGPoint {
+        let mid = CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2)
+        let dx = b.x - a.x, dy = b.y - a.y
+        let len = max((dx * dx + dy * dy).squareRoot(), 1)
+        var nx = -dy / len, ny = dx / len            // unit normal
+        if ny > 0 { nx = -nx; ny = -ny }             // bias upward (−y)
+        let off: CGFloat = 15
+        return CGPoint(x: mid.x + nx * off, y: mid.y + ny * off)
     }
 
     private func center(_ code: String, _ w: CGFloat, _ h: CGFloat) -> CGPoint {
@@ -124,13 +145,12 @@ private struct KingdomMap: View {
     }
 }
 
-/// An animated edge between two schematic nodes. Dash travels in the flow
-/// direction; a mid-pill prints the MW magnitude.
+/// An animated edge (line only) between two schematic nodes. The dash travels in
+/// the flow direction; the value label is drawn separately, above the nodes.
 private struct FlowEdge: View {
     let from: CGPoint
     let to: CGPoint
     let mw: Double
-    let label: String
     var accentInbound: Bool = false
 
     private var color: Color { accentInbound ? Theme.importIn : Theme.flowColor(mw) }
@@ -138,29 +158,36 @@ private struct FlowEdge: View {
 
     var body: some View {
         let dash: CGFloat = 18
-        ZStack {
-            TimelineView(.animation) { ctx in
-                let t = ctx.date.timeIntervalSinceReferenceDate
-                let travel = CGFloat((t.truncatingRemainder(dividingBy: Theme.flowPeriod)) / Theme.flowPeriod) * dash
-                Canvas { g, _ in
-                    var p = Path()
-                    p.move(to: from); p.addLine(to: to)
-                    g.stroke(p, with: .color(color.opacity(0.20)),
-                             style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                    g.stroke(p, with: .color(color),
-                             style: StrokeStyle(lineWidth: 3, lineCap: .round,
-                                                dash: [6, dash - 6],
-                                                dashPhase: forward ? -travel : travel))
-                }
+        TimelineView(.animation) { ctx in
+            let t = ctx.date.timeIntervalSinceReferenceDate
+            let travel = CGFloat((t.truncatingRemainder(dividingBy: Theme.flowPeriod)) / Theme.flowPeriod) * dash
+            Canvas { g, _ in
+                var p = Path()
+                p.move(to: from); p.addLine(to: to)
+                g.stroke(p, with: .color(color.opacity(0.20)),
+                         style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                g.stroke(p, with: .color(color),
+                         style: StrokeStyle(lineWidth: 3, lineCap: .round,
+                                            dash: [6, dash - 6],
+                                            dashPhase: forward ? -travel : travel))
             }
-            Text(label)
-                .font(Theme.number(11, weight: .bold))
-                .foregroundStyle(color)
-                .padding(.horizontal, 6).padding(.vertical, 2)
-                .background(Capsule().fill(Theme.bg))
-                .overlay(Capsule().strokeBorder(color.opacity(0.4), lineWidth: 1))
-                .position(x: (from.x + to.x) / 2, y: (from.y + to.y) / 2)
         }
+    }
+}
+
+/// The value pill for an edge, positioned absolutely and drawn in the top layer.
+private struct EdgeLabel: View {
+    let text: String
+    let color: Color
+    let at: CGPoint
+    var body: some View {
+        Text(text)
+            .font(Theme.number(11, weight: .bold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 6).padding(.vertical, 2)
+            .background(Capsule().fill(Theme.bg))
+            .overlay(Capsule().strokeBorder(color.opacity(0.4), lineWidth: 1))
+            .position(at)
     }
 }
 

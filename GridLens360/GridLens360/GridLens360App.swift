@@ -59,7 +59,7 @@ struct BootScreen: View {
                                 style: StrokeStyle(lineWidth: 3, lineCap: .round))
                         .frame(width: 96, height: 96)
                         .rotationEffect(.degrees(-90))
-                    Image(systemName: "grid")
+                    Image(systemName: "square.grid.3x3.fill")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundStyle(Theme.energy)
                         .shadow(color: Theme.energy.opacity(0.6), radius: 12)

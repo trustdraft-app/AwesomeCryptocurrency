@@ -28,9 +28,14 @@ confirm and archive.
 
 ## 2. Open the project
 
+From the repository root (`AwesomeCryptocurrency/`):
+
 ```bash
 open GridLens360/GridLens360.xcodeproj
 ```
+
+(If you are already inside the `GridLens360/` folder — where this BUILD.md lives —
+run `open GridLens360.xcodeproj` instead.)
 
 Xcode will index the `GridLens360/` source folder automatically (synchronized group — all
 Swift files and the asset catalog are picked up without manual references).

@@ -56,13 +56,13 @@ private struct RenewablesCard: View {
             Divider().overlay(Theme.hairlineSoft)
 
             // Eastern renewables — two honest countings.
-            Text("EASTERN — \(grid.renEOATotal.display) MW  ·  Σ of four rings")
+            Text("EASTERN — \(grid.renEOATotal.display) MW  ·  four renewable rings")
                 .font(.system(size: 11, weight: .bold)).foregroundStyle(Theme.textSecondary)
             HStack(spacing: 10) {
                 splitTile(grid.renEOAWind, "WIND", "wind", Theme.energy)
                 splitTile(grid.renEOAPV, "SOLAR PV", "sun.max.fill", Theme.amber)
             }
-            Text("Wind + PV are a generation-type split; the 674.9 MW total is the sum of four ring terms. The two countings are labelled and not summed together.")
+            Text("Wind and PV are a generation-type split. The eastern total is \(grid.renEOATotal.display) MW across four renewable rings whose one-decimal terms foot to 675.0 (a 0.1 rounding artefact). The two countings are labelled, never forced equal.")
                 .font(.system(size: 10, weight: .medium)).foregroundStyle(Theme.textTertiary)
                 .fixedSize(horizontal: false, vertical: true)
 

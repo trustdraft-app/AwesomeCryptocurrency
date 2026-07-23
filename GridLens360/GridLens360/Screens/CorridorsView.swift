@@ -74,7 +74,7 @@ private struct CorridorCard: View {
 
             FlowLine(mw: corridor.net, height: 20)
 
-            TagChip(tag: corridor.tag, timestamp: corridor.timestamp)
+            TagChip(tag: corridor.tag, timestamp: corridor.timestamp, isPITag: corridor.isPITag)
 
             if let note = corridor.note {
                 HStack(alignment: .top, spacing: 6) {
@@ -97,8 +97,11 @@ private struct CorridorCard: View {
                             .font(.system(size: 9, weight: .bold))
                         Text(isOpen ? "Hide metered legs" : "Show \(legs.count) metered legs")
                             .font(.system(size: 11, weight: .semibold))
+                        Spacer(minLength: 0)
                     }
                     .foregroundStyle(color)
+                    .padding(.vertical, 10)
+                    .contentShape(Rectangle())
                 }
                 if isOpen {
                     VStack(spacing: 0) {

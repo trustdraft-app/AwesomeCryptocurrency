@@ -82,12 +82,17 @@ struct BoardHeader: View {
                         .font(.system(size: 17, weight: .heavy).width(.expanded))
                         .tracking(1.0)
                         .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                     Text("Real-Time Grid Intelligence")
                         .font(.system(size: 10.5, weight: .medium))
                         .tracking(0.4)
                         .foregroundStyle(Theme.textTertiary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
-                Spacer()
+                .layoutPriority(1)
+                Spacer(minLength: 6)
                 StatusStamp(basis: grid.status, timestamp: grid.asOf)
             }
             HStack(spacing: 8) {
@@ -116,7 +121,7 @@ struct LensMark: View {
             Circle().trim(from: 0, to: 0.72)
                 .stroke(Theme.energyGrad, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .rotationEffect(.degrees(spin ? 360 : 0))
-            Image(systemName: "grid")
+            Image(systemName: "square.grid.3x3.fill")
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(Theme.energy)
         }

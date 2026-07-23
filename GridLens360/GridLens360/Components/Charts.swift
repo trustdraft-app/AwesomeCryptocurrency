@@ -39,10 +39,12 @@ struct OperatingDayCurve: View {
                                      startPoint: .top, endPoint: .bottom))
                 .opacity(Double(draw))
 
-                // The curve line, drawn on.
+                // The curve line, drawn on. Indices-based so an empty series can
+                // never trip a `1..<0` range or an out-of-bounds `pt(0)`.
                 Path { p in
-                    p.move(to: pt(0))
-                    for i in 1..<points.count { p.addLine(to: pt(i)) }
+                    guard let first = points.indices.first else { return }
+                    p.move(to: pt(first))
+                    for i in points.indices.dropFirst() { p.addLine(to: pt(i)) }
                 }
                 .trim(from: 0, to: draw)
                 .stroke(Theme.energyGrad,
@@ -66,7 +68,7 @@ struct OperatingDayCurve: View {
                             .font(.system(size: 8.5, weight: .medium))
                             .foregroundStyle(Theme.textTertiary)
                     }
-                    .position(x: min(max(p.x, 26), w - 26), y: max(p.y - 20, 12))
+                    .position(x: min(max(p.x, 26), w - 26), y: max(p.y - 20, 18))
                     .opacity(Double(draw))
                 }
             }
