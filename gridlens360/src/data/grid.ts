@@ -125,7 +125,7 @@ export const areas: AreaLoad[] = [
   { code: "COA", name: "Central",  loadMW: 17820, prevMW: 17410, tempC: 44, x: 47, y: 44, color: "#4c9bff" },
   { code: "EOA", name: "Eastern",  loadMW: 19842, prevMW: 19612, tempC: 41, x: 72, y: 46, color: "#42d2ce" },
   { code: "WOA", name: "Western",  loadMW: 14930, prevMW: 14560, tempC: 39, x: 20, y: 52, color: "#b08aff" },
-  { code: "SOA", name: "Southern", loadMW: 6410,  prevMW: 6260,  tempC: 33, x: 33, y: 78, color: "#48d986" },
+  { code: "SOA", name: "Southern", loadMW: 6410,  prevMW: 6260,  tempC: 33, x: 33, y: 72, color: "#48d986" },
   { code: "NEOA", name: "North-East", loadMW: 2118, prevMW: 2060, tempC: 40, x: 62, y: 18, color: "#ff923d" },
   { code: "NWOA", name: "North-West", loadMW: 1290, prevMW: 1250, tempC: 36, x: 33, y: 20, color: "#ff6868" },
 ];

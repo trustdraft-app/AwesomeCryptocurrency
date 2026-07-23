@@ -9,15 +9,17 @@ import { fmt } from "@/lib/format";
  */
 export default function KingdomMap({ areas, onSelect, selected }: { areas: AreaLoad[]; onSelect?: (c: string) => void; selected?: string }) {
   const maxLoad = Math.max(...areas.map((a) => a.loadMW));
+  // viewBox has bottom headroom (84) so the southern node's hit area + value
+  // label stay fully inside the canvas and remain tappable.
   return (
-    <svg viewBox="0 0 100 78" width="100%" role="img" aria-label="Kingdom operating areas" className="map-wrap">
+    <svg viewBox="0 0 100 84" width="100%" role="img" aria-label="Kingdom operating areas" className="map-wrap">
       <defs>
         <radialGradient id="seaGlow" cx="50%" cy="40%" r="70%">
           <stop offset="0%" stopColor="#0d3a63" stopOpacity="0.5" />
           <stop offset="100%" stopColor="#04101c" stopOpacity="0" />
         </radialGradient>
       </defs>
-      <rect x="0" y="0" width="100" height="78" fill="url(#seaGlow)" rx="4" />
+      <rect x="0" y="0" width="100" height="84" fill="url(#seaGlow)" rx="4" />
       {/* Stylised Kingdom outline */}
       <path
         d="M14 22 L30 14 L46 12 L58 15 L64 12 L74 16 L82 26 L84 38 L80 50 L72 60 L60 66 L46 68 L34 64 L24 56 L16 44 L12 32 Z"

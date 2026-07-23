@@ -121,6 +121,26 @@ done on Linux/CI):
    signing, no manual certs, API access not enabled). Xcode mints the signing certificate on
    first archive.
 
+5. **iOS privacy manifest is included.** `ios/App/App/PrivacyInfo.xcprivacy` declares no
+   tracking, no data collection, and the one required-reason API used (UserDefaults, reason
+   `CA92.1`) — it is already registered in the Xcode project's Copy Bundle Resources, so
+   TestFlight will not send "missing privacy manifest" (ITMS-91053) warnings. iPhone-only
+   (`TARGETED_DEVICE_FAMILY = "1"`) so App Review does not evaluate an untested iPad layout.
+
+## 6a. Before promoting Android beyond internal testing (Play production)
+
+The Android project targets **API 34**, which is fine for **Google Play internal testing**
+(exempt from the target-API gate). Before a **closed/open/production** Play release, Google
+requires **API 35**. That is a coordinated toolchain bump that must be built and tested on a
+real Android toolchain (not done here, to avoid shipping an unverified build):
+
+- `android/variables.gradle`: `compileSdkVersion = 35`, `targetSdkVersion = 35`
+- `android/build.gradle`: Android Gradle Plugin `8.6.0`+ (35 support)
+- `android/gradle/wrapper/gradle-wrapper.properties`: Gradle `8.7`+
+- then `npx cap sync android` and rebuild/verify the AAB.
+
+iOS/Apple is unaffected; the iPhone/TestFlight path needs none of this.
+
 ---
 
 ## 7. Verification performed (evidence)
