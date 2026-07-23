@@ -1,0 +1,191 @@
+/* GridLens 360 — executive mobile design system.
+   Dark-first control-room aesthetic, derived from the National Grid SA
+   EOA System Peak tokens and tuned for iPhone / Android OLED displays. */
+
+:root {
+  /* Brand + status palette */
+  --navy: #04101c;
+  --navy-1: #071c2e;
+  --navy-2: #0a2540;
+  --blue: #4c9bff;
+  --blue-deep: #2788f5;
+  --teal: #42d2ce;
+  --green: #48d986;
+  --purple: #b08aff;
+  --orange: #ff923d;
+  --amber: #ffc24b;
+  --red: #ff6868;
+  --pink: #ff7ea8;
+
+  /* Surfaces */
+  --bg: #04101c;
+  --bg-grad: radial-gradient(140% 120% at 50% -10%, #0b2a4a 0%, #071c2e 42%, #04101c 100%);
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-2: rgba(255, 255, 255, 0.07);
+  --surface-solid: #0a2038;
+  --stroke: rgba(120, 170, 230, 0.16);
+  --stroke-strong: rgba(120, 170, 230, 0.32);
+
+  /* Text */
+  --ink: #eaf3ff;
+  --ink-dim: #a7bdd6;
+  /* Lightened from #6f88a6 to clear WCAG AA (~4.5:1) for small text on elevated surfaces. */
+  --ink-faint: #92a8c4;
+
+  /* Geometry */
+  --r-lg: 20px;
+  --r-md: 15px;
+  --r-sm: 10px;
+  --pad: 16px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.3);
+  --tabbar-h: 62px;
+  --topbar-h: 60px;
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto,
+    system-ui, sans-serif;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg);
+  background-image: var(--bg-grad);
+  background-attachment: fixed;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+/* Allow copying data values; keep only the chrome non-selectable. */
+.tabbar,
+.topbar,
+.seg,
+button {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+a { color: inherit; text-decoration: none; }
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ── App shell ─────────────────────────────────────────────── */
+.shell {
+  min-height: 100dvh;
+  /* Top safe-area inset is handled once, by .topbar. Do not add it here too. */
+  padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom));
+}
+
+.scroll {
+  padding: 14px var(--pad) 28px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Panels ────────────────────────────────────────────────── */
+.panel {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-md);
+  padding: 14px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--accent, var(--blue));
+  opacity: 0.9;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin: 0 0 12px;
+}
+.panel-title .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent, var(--blue));
+  box-shadow: 0 0 12px var(--accent, var(--blue));
+}
+.panel-title .aux {
+  margin-left: auto;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--ink-faint);
+  font-size: 11px;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; align-items: center; gap: 10px; }
+
+/* ── Section heading ──────────────────────────────────────── */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 22px 2px 12px;
+}
+.section-head h2 {
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.section-head .sub {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+/* utility text */
+.mono { font-variant-numeric: tabular-nums; }
+.dim { color: var(--ink-dim); }
+.faint { color: var(--ink-faint); }
+.up { color: var(--green); }
+.down { color: var(--red); }
+.flat { color: var(--ink-dim); }
