@@ -135,7 +135,7 @@ export default function Command() {
         <Donut
           size={150}
           slices={[
-            { label: "Conventional", value: national.demandMW - national.renewableMW + national.bessNetMW, color: "var(--blue)" },
+            { label: "Conventional", value: national.demandMW - national.renewableMW, color: "var(--blue)" },
             { label: "Renewables", value: national.renewableMW, color: "var(--teal)" },
           ]}
           centerTop={`${renewSharePct.toFixed(0)}%`}

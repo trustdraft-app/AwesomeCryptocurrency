@@ -89,8 +89,10 @@ export const meta = {
   operator: "National Grid SA — Transmission Grid Operator",
   team: "Digitalization Team",
   classification: "Confidential — Internal",
-  asOf: "2026-07-19T15:58:00+03:00",
-  asOfLabel: "19 Jul 2026 · 15:58 KSA",
+  // Observation time is AFTER today's peak (15:58): current readings sit below
+  // the peak, matching the source EOA dashboard's "Current (16:46)" reading.
+  asOf: "2026-07-19T16:46:00+03:00",
+  asOfLabel: "19 Jul 2026 · 16:46 KSA",
   timezone: "Asia/Riyadh",
   snapshot: true,
 };
@@ -211,6 +213,8 @@ export const generation: UnitBreakdown[] = [
   { name: "Marafiq", valueMW: 3980 },
   { name: "Jubail SWCC", valueMW: 139 },
   { name: "Sadaf Cogen", valueMW: 168 },
+  // Reconciling remainder so the mix sums to eoa.totalGenerationMW (21,853).
+  { name: "Other IPP / Small", valueMW: 281 },
 ];
 
 /* Non-SEC spin breakdown (approved UI). */
@@ -263,7 +267,7 @@ export const neoa: { node: string; loadMW: number; genMW: number }[] = [
 /* Contracted capacities from the KPI workbook (Renwable sheet). Current MW is
  * the snapshot solar/wind output at 15:58 (PV high, wind moderate). */
 export const renewables: RenewablePlant[] = [
-  { name: "Sudair PV",         area: "COA",  type: "PV",   capacityMW: 1500, currentMW: 1086 },
+  { name: "Sudair PV",         area: "COA",  type: "PV",   capacityMW: 1500, currentMW: 1091 },
   { name: "Ar Rass 2 PV",      area: "COA",  type: "PV",   capacityMW: 2000, currentMW: 1452 },
   { name: "Ar Rass 1 PV",      area: "COA",  type: "PV",   capacityMW: 700,  currentMW: 508 },
   { name: "Shuaibah 2 PV",     area: "WOA",  type: "PV",   capacityMW: 2060, currentMW: 1503 },
@@ -299,7 +303,7 @@ export const renewableToday: SeriesPoint[] = [
 /* ───────────────────────── BESS FLEET ──────────────────────────── */
 /* National BESS fleet (BESS sheet). + discharging, − charging. */
 export const bess: BessSite[] = [
-  { name: "Qaisumah",      area: "EOA", powerMW: 1000, energyMWh: 3000, currentMW: 0,    socPct: 62 },
+  { name: "Qaisumah",      area: "EOA", powerMW: 1000, energyMWh: 3000, currentMW: -22,  socPct: 62 },
   { name: "Jouf",          area: "EOA", powerMW: 500,  energyMWh: 1500, currentMW: -42,  socPct: 71 },
   { name: "Bisha",         area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: -38,  socPct: 68 },
   { name: "Madaya",        area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: -30,  socPct: 74 },

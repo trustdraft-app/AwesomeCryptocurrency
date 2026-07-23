@@ -53,7 +53,7 @@ export default function Peak() {
           color="var(--blue)"
         />
         <div className="grid-3" style={{ marginTop: 8 }}>
-          <MiniStat label="Now (18:00)" value={`${fmt(eoa.demandMW)} MW`} />
+          <MiniStat label="Now (16:46)" value={`${fmt(eoa.demandMW)} MW`} />
           <MiniStat label="Change" value={`${fmtSigned(eoa.demandMW - eoa.demandPrevMW)} · ${deltaPct(eoa.demandMW, eoa.demandPrevMW).toFixed(1)}%`} tone={eoa.demandMW >= eoa.demandPrevMW ? "up" : "down"} />
           <MiniStat label="Peak" value={`${fmt(eoa.peakMW)} MW`} tone="amber" />
         </div>

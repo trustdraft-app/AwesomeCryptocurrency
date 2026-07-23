@@ -7,7 +7,7 @@ import { HealthPill } from "@/components/StatusPill";
 import { generation, reserves, nonSecSpin, n2Limits, eoa, interchange, meta } from "@/data/grid";
 import { fmt, bandFromUtil, healthColor } from "@/lib/format";
 
-const GEN_COLORS = ["#4c9bff", "#42d2ce", "#48d986", "#b08aff", "#ff923d", "#ffc24b", "#ff7ea8"];
+const GEN_COLORS = ["#4c9bff", "#42d2ce", "#48d986", "#b08aff", "#ff923d", "#ffc24b", "#ff7ea8", "#8aa0b8"];
 
 export default function Power() {
   const totalGen = generation.reduce((s, g) => s + g.valueMW, 0);
@@ -35,7 +35,7 @@ export default function Power() {
         <Donut
           size={168}
           slices={generation.map((g, i) => ({ label: g.name, value: g.valueMW, color: GEN_COLORS[i % GEN_COLORS.length] }))}
-          centerTop={fmt(Math.round(totalGen / 1000) * 1) + "k"}
+          centerTop={(totalGen / 1000).toFixed(1) + "k"}
           centerBottom="MW total"
         />
       </Panel>
