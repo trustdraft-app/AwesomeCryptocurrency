@@ -139,7 +139,7 @@ function Storage() {
 
       <div className="insight">
         <span className="ic">⚡</span>
-        <span>The national storage fleet (<b>{fmt(totalPower)} MW</b> / <b>{fmt(totalEnergy)} MWh</b>) is net <b>{net < 0 ? "charging" : "discharging"} {fmt(Math.abs(net))} MW</b>, banking midday solar for the evening ramp at an average <b>{avgSoc.toFixed(0)}%</b> state of charge.</span>
+        <span>The national storage fleet (<b>{fmt(totalPower)} MW</b> / <b>{fmt(totalEnergy)} MWh</b>) is net <b>{net < 0 ? "charging" : "discharging"} {fmt(Math.abs(net))} MW</b>, {net < 0 ? "banking surplus solar for the evening ramp" : "discharging into the evening ramp as solar fades"} at an average <b>{avgSoc.toFixed(0)}%</b> state of charge.</span>
       </div>
     </>
   );

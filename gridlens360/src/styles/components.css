@@ -27,9 +27,13 @@
   letter-spacing: 0.03em;
   color: var(--ink-faint);
   text-transform: uppercase;
-  white-space: nowrap;
+  /* Wrap to 2 lines instead of truncating — the label is the meaning of the number. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  min-height: 2.1em;
 }
 .kpi-value {
   font-weight: 800;
@@ -39,10 +43,10 @@
   color: var(--ink);
 }
 .kpi-unit {
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 600;
   color: var(--ink-faint);
-  margin-left: 4px;
+  margin-left: 3px;
 }
 .kpi-foot {
   display: flex;
@@ -164,8 +168,8 @@
   align-items: center;
   justify-content: center;
   gap: 3px;
-  color: var(--ink-faint);
-  font-size: 9.5px;
+  color: var(--ink-dim);
+  font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.01em;
   position: relative;
@@ -242,7 +246,11 @@
 }
 .seg button {
   flex: 1;
-  font-size: 12px;
+  min-height: 44px; /* iOS 44pt / Android 48dp minimum touch target */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
   font-weight: 600;
   padding: 7px 6px;
   border-radius: 8px;
@@ -277,4 +285,19 @@
   color: var(--ink-faint);
   margin: 20px 6px 6px;
   line-height: 1.5;
+}
+
+/* Respect the OS "Reduce Motion" setting (vestibular safety). Framer Motion is
+   handled separately via <MotionConfig reducedMotion="user">; this covers CSS. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .live-dot {
+    animation: none !important;
+  }
 }

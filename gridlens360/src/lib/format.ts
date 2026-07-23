@@ -1,7 +1,10 @@
 import type { Health, Trend } from "@/data/grid";
 
 export const fmt = (n: number, decimals = 0): string =>
-  n.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  // Use the typographic minus (U+2212) so negatives match fmtSigned everywhere.
+  n
+    .toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+    .replace("-", "−");
 
 /** Signed value, e.g. +330 / −172. Uses a true minus sign for typographic quality. */
 export const fmtSigned = (n: number, decimals = 0): string => {

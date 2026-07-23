@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Referenced by AppTheme in styles.xml. Absence breaks aapt2 resource linking. -->
+    <color name="colorPrimary">#04101C</color>
+    <color name="colorPrimaryDark">#04101C</color>
+    <color name="colorAccent">#2788F5</color>
+</resources>

@@ -53,7 +53,7 @@ export default function Peak() {
           color="var(--blue)"
         />
         <div className="grid-3" style={{ marginTop: 8 }}>
-          <MiniStat label="Now (16:46)" value={`${fmt(eoa.demandMW)} MW`} />
+          <MiniStat label="Now (18:00)" value={`${fmt(eoa.demandMW)} MW`} />
           <MiniStat label="Change" value={`${fmtSigned(eoa.demandMW - eoa.demandPrevMW)} · ${deltaPct(eoa.demandMW, eoa.demandPrevMW).toFixed(1)}%`} tone={eoa.demandMW >= eoa.demandPrevMW ? "up" : "down"} />
           <MiniStat label="Peak" value={`${fmt(eoa.peakMW)} MW`} tone="amber" />
         </div>
@@ -126,10 +126,15 @@ export default function Peak() {
                   <span className="faint"> gen</span>
                 </span>
               </div>
-              <div style={{ display: "flex", gap: 4, height: 6 }}>
-                <div style={{ flex: n.loadMW / maxNeoa, background: "var(--purple)", borderRadius: 4 }} />
-                <div style={{ flex: n.genMW / maxNeoa, background: "var(--green)", borderRadius: 4 }} />
-                <div style={{ flex: (maxNeoa - Math.max(n.loadMW, n.genMW)) / maxNeoa }} />
+              {/* Two independent full-width tracks so widths are proportional and
+                  comparable across nodes (load and gen share the same scale). */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                <div style={{ height: 6, borderRadius: 4, background: "var(--surface-2)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${(n.loadMW / maxNeoa) * 100}%`, background: "var(--purple)", borderRadius: 4 }} />
+                </div>
+                <div style={{ height: 6, borderRadius: 4, background: "var(--surface-2)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${(n.genMW / maxNeoa) * 100}%`, background: "var(--green)", borderRadius: 4 }} />
+                </div>
               </div>
             </div>
           ))}

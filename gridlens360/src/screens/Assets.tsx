@@ -35,7 +35,8 @@ export default function Assets() {
           <AnimatedNumber value={worst} decimals={0} /><span className="u">%</span>
         </div>
         <div className="row" style={{ gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-          <HealthPill health={bandFromUtil(worst)}>Highest loading</HealthPill>
+          {/* Band from the rounded value shown in the hero, so 95% never reads as "watch". */}
+          <HealthPill health={bandFromUtil(Math.round(worst))}>Highest loading</HealthPill>
           <HealthPill health={atRisk > 0 ? "watch" : "good"}>{atRisk} approaching firm</HealthPill>
         </div>
       </div>

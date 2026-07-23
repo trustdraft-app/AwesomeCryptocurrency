@@ -104,8 +104,9 @@ done on Linux/CI):
    ever misled into thinking it is real-time. All headline figures trace to the cached PI
    samples and the KPI workbook in your source files.
    - To make it **live**, the production path is already defined in the source projects:
-     bind `src/data/grid.ts` to the OSIsoft **PI Web API** (`https://e-dhq-socpcca/piwebapi`,
-     data server `e-dhq-pisrv2`). That requires a secure network path + authentication and is
+     bind `src/data/grid.ts` to the operator's internal OSIsoft **PI Web API** endpoint
+     (host/data-server configured out-of-band, not committed to source). That requires a
+     secure network path + authentication and is
      a separate, scoped piece of work — do not distribute a "live" claim until that exists.
 
 2. **Firm-capacity substation rows are representative** (labelled in-app on the Assets screen)

@@ -37,8 +37,26 @@ export default function KingdomMap({ areas, onSelect, selected }: { areas: AreaL
       {areas.map((a, i) => {
         const rr = 2.6 + (a.loadMW / maxLoad) * 4.4;
         const isSel = selected === a.code;
+        const interactive = !!onSelect;
         return (
-          <g key={a.code} className="map-node" onClick={() => onSelect?.(a.code)} style={{ cursor: onSelect ? "pointer" : "default" }}>
+          <g
+            key={a.code}
+            className="map-node"
+            onClick={() => onSelect?.(a.code)}
+            onKeyDown={(e) => {
+              if (interactive && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                onSelect?.(a.code);
+              }
+            }}
+            role={interactive ? "button" : undefined}
+            tabIndex={interactive ? 0 : undefined}
+            aria-label={`${a.name} area, ${fmt(a.loadMW)} megawatts`}
+            aria-pressed={interactive ? isSel : undefined}
+            style={{ cursor: interactive ? "pointer" : "default" }}
+          >
+            {/* Transparent ≥44px-equivalent hit target for quick, reliable taps. */}
+            {interactive && <circle cx={a.x} cy={a.y} r={7} fill="transparent" />}
             <motion.circle
               cx={a.x}
               cy={a.y}

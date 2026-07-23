@@ -29,7 +29,8 @@
   /* Text */
   --ink: #eaf3ff;
   --ink-dim: #a7bdd6;
-  --ink-faint: #6f88a6;
+  /* Lightened from #6f88a6 to clear WCAG AA (~4.5:1) for small text on elevated surfaces. */
+  --ink-faint: #92a8c4;
 
   /* Geometry */
   --r-lg: 20px;
@@ -71,7 +72,15 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overscroll-behavior-y: none;
+}
+
+/* Allow copying data values; keep only the chrome non-selectable. */
+.tabbar,
+.topbar,
+.seg,
+button {
   user-select: none;
+  -webkit-user-select: none;
 }
 
 button {
@@ -93,7 +102,7 @@ a { color: inherit; text-decoration: none; }
 /* ── App shell ─────────────────────────────────────────────── */
 .shell {
   min-height: 100dvh;
-  padding-top: var(--safe-top);
+  /* Top safe-area inset is handled once, by .topbar. Do not add it here too. */
   padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom));
 }
 

@@ -17,6 +17,8 @@ export default function Command() {
   const reserveMarginPct = (national.reserveMW / national.demandMW) * 100;
   const renewSharePct = (national.renewableMW / national.demandMW) * 100;
   const selArea = areas.find((a) => a.code === sel)!;
+  const demandTrend = trendOf(national.demandMW, national.demandPrevMW);
+  const demandArrow = demandTrend === "up" ? "▲" : demandTrend === "down" ? "▼" : "▬";
 
   return (
     <div className="stack">
@@ -34,15 +36,15 @@ export default function Command() {
           <span className="u">MW</span>
         </div>
         <div className="row" style={{ gap: 14, marginTop: 8 }}>
-          <span className="up" style={{ fontWeight: 700, fontSize: 13 }}>
-            ▲ {fmtSigned(national.demandMW - national.demandPrevMW)} MW · {deltaPct(national.demandMW, national.demandPrevMW).toFixed(1)}%
+          <span className={demandTrend} style={{ fontWeight: 700, fontSize: 13 }}>
+            {demandArrow} {fmtSigned(national.demandMW - national.demandPrevMW)} MW · {deltaPct(national.demandMW, national.demandPrevMW).toFixed(1)}%
           </span>
           <span style={{ marginLeft: "auto" }}>
             <Sparkline data={ksaToday} color="var(--teal)" width={120} height={34} />
           </span>
         </div>
         <div className="row" style={{ gap: 8, marginTop: 12, flexWrap: "wrap" }}>
-          <HealthPill health={bandFromUtil(100 - reserveMarginPct > 80 ? 90 : 60)}>
+          <HealthPill health={bandFromUtil(100 - reserveMarginPct)}>
             Reserve margin {reserveMarginPct.toFixed(1)}%
           </HealthPill>
           <HealthPill health="good">Frequency {national.frequencyHz.toFixed(2)} Hz</HealthPill>

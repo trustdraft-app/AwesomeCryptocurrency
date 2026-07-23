@@ -17,9 +17,10 @@
  *   4. BESS / Renewable KPIs workbook     → renewable plant fleet + contracted
  *      capacity, and the national BESS fleet with state-of-charge.
  *
- * In the PRODUCTION deployment these values bind live to the OSIsoft PI Web API
- * (https://e-dhq-socpcca/piwebapi, data server e-dhq-pisrv2) via the tag map
- * carried in the source projects. This TestFlight build ships an authoritative
+ * In the PRODUCTION deployment these values bind live to the operator's internal
+ * OSIsoft PI Web API endpoint (host and data server configured out-of-band, not
+ * in source) via the tag map carried in the source projects. This TestFlight
+ * build ships an authoritative
  * SNAPSHOT so the app runs fully offline for executive reviewers with no SCADA /
  * VPN access — the "as-of" timestamp and SNAPSHOT badge make that explicit.
  * Substation firm-capacity rows are representative Dammam-area figures pending
@@ -89,10 +90,11 @@ export const meta = {
   operator: "National Grid SA — Transmission Grid Operator",
   team: "Digitalization Team",
   classification: "Confidential — Internal",
-  // Observation time is AFTER today's peak (15:58): current readings sit below
-  // the peak, matching the source EOA dashboard's "Current (16:46)" reading.
-  asOf: "2026-07-19T16:46:00+03:00",
-  asOfLabel: "19 Jul 2026 · 16:46 KSA",
+  // Observation time is the evening ramp (18:00): well after today's 15:58 peak,
+  // so every "now" figure sits on the 18:00 point of its intraday curve — demand
+  // easing off the peak, solar fading, batteries discharging into the evening.
+  asOf: "2026-07-19T18:00:00+03:00",
+  asOfLabel: "19 Jul 2026 · 18:00 KSA",
   timezone: "Asia/Riyadh",
   snapshot: true,
 };
@@ -110,11 +112,11 @@ export const national = {
   frequencyHz: 59.98,
   capacityMW: 89240,
   reserveMW: 21830,
-  renewableMW: 10610,
-  renewableCapacityMW: 15523,
-  bessNetMW: -146, // charging
-  bessFleetMW: 8000,
-  bessFleetMWh: 24000,
+  renewableMW: 4980, // evening (18:00) output — solar fading past the midday peak
+  renewableCapacityMW: 15423,
+  bessNetMW: 1180, // discharging into the evening ramp
+  bessFleetMW: 7500,
+  bessFleetMWh: 22500,
   co2AvoidedKt: 214, // today, from renewable displacement (illustrative roll-up)
 };
 
@@ -130,7 +132,7 @@ export const areas: AreaLoad[] = [
 
 /* Interconnector / tie-line flows (Grid Summary — Tie Lines). + = export. */
 export const tieLines: UnitBreakdown[] = [
-  { name: "COA → EOA", valueMW: 1868 },
+  { name: "EOA → COA", valueMW: 1868 },
   { name: "COA → WOA", valueMW: 2240 },
   { name: "COA → SOA", valueMW: 980 },
   { name: "COA → NEOA", valueMW: 610 },
@@ -154,7 +156,8 @@ export const eoa = {
   totalGenerationMW: 21853,
   genAtPeakMW: 23783,
   tempC: 41,
-  frequencyHz: 59.955,
+  // Single synchronous 60 Hz system — identical to national.frequencyHz at any instant.
+  frequencyHz: 59.98,
   aceMW: -172.5,
 };
 
@@ -166,7 +169,7 @@ export const eoaToday: SeriesPoint[] = [
   { t: "09:00", v: 18720 }, { t: "10:00", v: 19380 }, { t: "11:00", v: 19840 },
   { t: "12:00", v: 20180 }, { t: "13:00", v: 20460 }, { t: "14:00", v: 20620 },
   { t: "15:00", v: 20686 }, { t: "16:00", v: 20540 }, { t: "17:00", v: 20210 },
-  { t: "18:00", v: 19870 }, { t: "19:00", v: 19980 }, { t: "20:00", v: 19720 },
+  { t: "18:00", v: 19842 }, { t: "19:00", v: 19980 }, { t: "20:00", v: 19720 },
   { t: "21:00", v: 19180 }, { t: "22:00", v: 18320 }, { t: "23:00", v: 17600 },
 ];
 
@@ -198,7 +201,7 @@ export const reserves = {
   regulationLowMW: 505,
   availableCapacityMW: 26970,
   availableEoaMW: 23990,
-  availableNeoMW: 2979,
+  availableNeoMW: 2980, // 23990 + 2980 = 26970 (was 2979, off by 1)
   standbyMW: 716,
   unavailableMW: 2007,
   secUnavailableUnits: 3,
@@ -225,13 +228,14 @@ export const nonSecSpin: UnitBreakdown[] = [
   { name: "FDGP", valueMW: 150 },
 ];
 
-/* Interchange (EOA). */
+/* Interchange (EOA). EOA is generation-rich (gen 21,853 − demand 19,842 ≈ 2 GW),
+ * so it is a net EXPORTER; net ≈ tie actuals (EOA→COA 1868 + EOA→NEOA 610 − COA→EOA 620). */
 export const interchange = {
   scheduledMW: 1141,
-  netMW: 342,
+  netMW: 1858, // net export, consistent with the generation surplus and tie actuals
   coaExportMW: 1868,
   gcciaMW: 0,
-  exportDeviationMW: -2448,
+  exportDeviationMW: 717, // net − scheduled = 1858 − 1141
 };
 
 /* N-2 interchange limits (EOA Units → Interchange Limits N-2). */
@@ -254,38 +258,41 @@ export const subAreas: UnitBreakdown[] = [
 ];
 
 /* NEOA load & generation by node (approved UI). */
+/* Node load sums to areas[NEOA].loadMW (2,118); gen (1,567) sits below load —
+ * NEOA is a net importer (EOA→NEOA 610 + NWOA→NEOA 180 − NEOA→COA 240 ≈ 550). */
 export const neoa: { node: string; loadMW: number; genMW: number }[] = [
-  { node: "Jouf", loadMW: 812, genMW: 756 },
-  { node: "A'rar", loadMW: 642, genMW: 598 },
-  { node: "Qurayyat", loadMW: 538, genMW: 503 },
-  { node: "Tabarjal", loadMW: 412, genMW: 389 },
-  { node: "Turaif", loadMW: 371, genMW: 352 },
-  { node: "Rafha", loadMW: 356, genMW: 331 },
+  { node: "Jouf", loadMW: 549, genMW: 405 },
+  { node: "A'rar", loadMW: 434, genMW: 320 },
+  { node: "Qurayyat", loadMW: 364, genMW: 269 },
+  { node: "Tabarjal", loadMW: 279, genMW: 208 },
+  { node: "Turaif", loadMW: 251, genMW: 188 },
+  { node: "Rafha", loadMW: 241, genMW: 177 },
 ];
 
 /* ─────────────────────── RENEWABLE FLEET ───────────────────────── */
-/* Contracted capacities from the KPI workbook (Renwable sheet). Current MW is
- * the snapshot solar/wind output at 15:58 (PV high, wind moderate). */
+/* Contracted capacities from the KPI workbook (Renwable sheet). currentMW is the
+ * 18:00 evening output (PV fading, wind holding) — the fleet sums to
+ * national.renewableMW (4,980) = renewableToday at 18:00. */
 export const renewables: RenewablePlant[] = [
-  { name: "Sudair PV",         area: "COA",  type: "PV",   capacityMW: 1500, currentMW: 1091 },
-  { name: "Ar Rass 2 PV",      area: "COA",  type: "PV",   capacityMW: 2000, currentMW: 1452 },
-  { name: "Ar Rass 1 PV",      area: "COA",  type: "PV",   capacityMW: 700,  currentMW: 508 },
-  { name: "Shuaibah 2 PV",     area: "WOA",  type: "PV",   capacityMW: 2060, currentMW: 1503 },
-  { name: "Shuaibah 1 PV",     area: "WOA",  type: "PV",   capacityMW: 600,  currentMW: 438 },
-  { name: "Haden PV",          area: "WOA",  type: "PV",   capacityMW: 2000, currentMW: 1440 },
-  { name: "Al Henakiyah PV",   area: "COA",  type: "PV",   capacityMW: 1100, currentMW: 792 },
-  { name: "Al Khafa PV",       area: "COA",  type: "PV",   capacityMW: 1425, currentMW: 1026 },
-  { name: "Saad 2 PV",         area: "COA",  type: "PV",   capacityMW: 1125, currentMW: 810 },
-  { name: "Saad 1 PV",         area: "COA",  type: "PV",   capacityMW: 300,  currentMW: 216 },
-  { name: "Sakaka PV",         area: "NEOA", type: "PV",   capacityMW: 300,  currentMW: 214 },
-  { name: "Rabigh South PV",   area: "WOA",  type: "PV",   capacityMW: 300,  currentMW: 219 },
-  { name: "Jeddah South PV",   area: "WOA",  type: "PV",   capacityMW: 300,  currentMW: 216 },
-  { name: "Wadi Al Dawasir PV",area: "SOA",  type: "PV",   capacityMW: 112,  currentMW: 79 },
-  { name: "Layla 2 PV",        area: "COA",  type: "PV",   capacityMW: 91,   currentMW: 65 },
-  { name: "Layla 1 PV",        area: "COA",  type: "PV",   capacityMW: 10,   currentMW: 7 },
-  { name: "Dumat Al Jandal Wind", area: "NEOA", type: "Wind", capacityMW: 400, currentMW: 214 },
-  { name: "Waad Al Shammal WF",   area: "NEOA", type: "Wind", capacityMW: 500, currentMW: 168 },
-  { name: "Al Ghat WF",           area: "COA",  type: "Wind", capacityMW: 600, currentMW: 152 },
+  { name: "Sudair PV",         area: "COA",  type: "PV",   capacityMW: 1500, currentMW: 477 },
+  { name: "Ar Rass 2 PV",      area: "COA",  type: "PV",   capacityMW: 2000, currentMW: 635 },
+  { name: "Ar Rass 1 PV",      area: "COA",  type: "PV",   capacityMW: 700,  currentMW: 222 },
+  { name: "Shuaibah 2 PV",     area: "WOA",  type: "PV",   capacityMW: 2060, currentMW: 656 },
+  { name: "Shuaibah 1 PV",     area: "WOA",  type: "PV",   capacityMW: 600,  currentMW: 191 },
+  { name: "Haden PV",          area: "WOA",  type: "PV",   capacityMW: 2000, currentMW: 629 },
+  { name: "Al Henakiyah PV",   area: "COA",  type: "PV",   capacityMW: 1100, currentMW: 346 },
+  { name: "Al Khafa PV",       area: "COA",  type: "PV",   capacityMW: 1425, currentMW: 448 },
+  { name: "Saad 2 PV",         area: "COA",  type: "PV",   capacityMW: 1125, currentMW: 354 },
+  { name: "Saad 1 PV",         area: "COA",  type: "PV",   capacityMW: 300,  currentMW: 94 },
+  { name: "Sakaka PV",         area: "NEOA", type: "PV",   capacityMW: 300,  currentMW: 93 },
+  { name: "Rabigh South PV",   area: "WOA",  type: "PV",   capacityMW: 300,  currentMW: 96 },
+  { name: "Jeddah South PV",   area: "WOA",  type: "PV",   capacityMW: 300,  currentMW: 94 },
+  { name: "Wadi Al Dawasir PV",area: "SOA",  type: "PV",   capacityMW: 112,  currentMW: 34 },
+  { name: "Layla 2 PV",        area: "COA",  type: "PV",   capacityMW: 91,   currentMW: 28 },
+  { name: "Layla 1 PV",        area: "COA",  type: "PV",   capacityMW: 10,   currentMW: 3 },
+  { name: "Dumat Al Jandal Wind", area: "NEOA", type: "Wind", capacityMW: 400, currentMW: 233 },
+  { name: "Waad Al Shammal WF",   area: "NEOA", type: "Wind", capacityMW: 500, currentMW: 182 },
+  { name: "Al Ghat WF",           area: "COA",  type: "Wind", capacityMW: 600, currentMW: 165 },
 ];
 
 /* Renewable intraday output (national, MW) — solar bell + wind base. */
@@ -301,16 +308,17 @@ export const renewableToday: SeriesPoint[] = [
 ];
 
 /* ───────────────────────── BESS FLEET ──────────────────────────── */
-/* National BESS fleet (BESS sheet). + discharging, − charging. */
+/* National BESS fleet (BESS sheet). + discharging, − charging. At 18:00 the fleet
+ * is discharging into the evening ramp; net = +1,180 MW = national.bessNetMW. */
 export const bess: BessSite[] = [
-  { name: "Qaisumah",      area: "EOA", powerMW: 1000, energyMWh: 3000, currentMW: -22,  socPct: 62 },
-  { name: "Jouf",          area: "EOA", powerMW: 500,  energyMWh: 1500, currentMW: -42,  socPct: 71 },
-  { name: "Bisha",         area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: -38,  socPct: 68 },
-  { name: "Madaya",        area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: -30,  socPct: 74 },
-  { name: "Najran",        area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: 12,   socPct: 55 },
-  { name: "Khamis",        area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: -18,  socPct: 66 },
-  { name: "Dawadmi (9037)",area: "COA", powerMW: 2000, energyMWh: 6000, currentMW: -6,   socPct: 58 },
-  { name: "Airport (9089)",area: "COA", powerMW: 2000, energyMWh: 6000, currentMW: -2,   socPct: 60 },
+  { name: "Qaisumah",      area: "EOA", powerMW: 1000, energyMWh: 3000, currentMW: 180, socPct: 52 },
+  { name: "Jouf",          area: "EOA", powerMW: 500,  energyMWh: 1500, currentMW: 90,  socPct: 58 },
+  { name: "Bisha",         area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: 85,  socPct: 54 },
+  { name: "Madaya",        area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: 80,  socPct: 60 },
+  { name: "Najran",        area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: 75,  socPct: 44 },
+  { name: "Khamis",        area: "SOA", powerMW: 500,  energyMWh: 1500, currentMW: 70,  socPct: 52 },
+  { name: "Dawadmi (9037)",area: "COA", powerMW: 2000, energyMWh: 6000, currentMW: 330, socPct: 46 },
+  { name: "Airport (9089)",area: "COA", powerMW: 2000, energyMWh: 6000, currentMW: 270, socPct: 48 },
 ];
 
 /* Battery cycle today (national net MW) — charge midday, discharge evening. */

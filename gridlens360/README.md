@@ -33,8 +33,9 @@ iPhone / Android experience for C-level, VP Operations & Control, and ministeria
   **fully offline** (essential for sensitive TestFlight distribution with no SCADA/VPN).
 - **Data:** A single typed dataset (`src/data/grid.ts`) distilled faithfully from the
   source dashboards' cached PI samples and the KPI workbook. In production this binds
-  live to the **OSIsoft PI Web API** (`https://e-dhq-socpcca/piwebapi`, data server
-  `e-dhq-pisrv2`) using the tag maps carried in the source projects. The shipped build
+  live to the operator's internal **OSIsoft PI Web API** endpoint (host and data
+  server configured out-of-band, not in source) using the tag maps carried in the
+  source projects. The shipped build
   is an authoritative **SNAPSHOT** (badge + "as of" timestamp are shown in-app).
 
 ## Registered Apple identity (already wired in)

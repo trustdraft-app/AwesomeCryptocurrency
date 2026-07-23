@@ -39,14 +39,18 @@ export default function LineChart({
   const iw = W - padL - padR;
   const ih = H - padT - padB;
 
+  const n = series.length;
+  if (n < 2) return <svg width="100%" viewBox={`0 0 ${W} ${H}`} aria-hidden />; // nothing to plot
+
   const all = [...series, ...(compare ?? [])].map((d) => d.v);
   const rawMin = Math.min(...all);
   const rawMax = Math.max(...all);
   const pad = (rawMax - rawMin) * 0.12 || 1;
-  const min = rawMin - pad;
+  // Don't let padding push the floor below zero for a non-negative series
+  // (avoids a phantom negative gridline label under e.g. a solar-output curve).
+  const min = rawMin >= 0 ? Math.max(0, rawMin - pad) : rawMin - pad;
   const max = rawMax + pad;
   const span = max - min || 1;
-  const n = series.length;
 
   const px = (i: number) => padL + (i / (n - 1)) * iw;
   const py = (v: number) => padT + ih - ((v - min) / span) * ih;

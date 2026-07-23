@@ -44,7 +44,7 @@ export default function KpiTile({
       transition={{ duration: 0.4, delay, ease: "easeOut" }}
     >
       <div className="kpi-label">{label}</div>
-      <div className="kpi-value" style={{ fontSize: big ? 38 : 27 }}>
+      <div className="kpi-value" style={{ fontSize: big ? 38 : 25 }}>
         <AnimatedNumber value={value} decimals={decimals} />
         <span className="kpi-unit">{unit}</span>
       </div>
