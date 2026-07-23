@@ -1,5 +1,11 @@
 # GridLens 360 — Real-Time Grid Intelligence
 
+> **New here? Start with the plain-English guides:**
+> - 👔 **[FOR-EXECUTIVES.md](./FOR-EXECUTIVES.md)** — how to install and use the app (for leadership).
+> - 🛠️ **[FOR-ADMINISTRATORS.md](./FOR-ADMINISTRATORS.md)** — the easiest step-by-step setup & TestFlight upload.
+>
+> The sections below (and TESTFLIGHT.md / HANDOVER.md) are the engineering reference.
+
 Executive mobile app for National Grid SA transmission leadership. It consolidates
 three separate control-room dashboards and a KPI workbook into a single, glance-first
 iPhone / Android experience for C-level, VP Operations & Control, and ministerial review.
